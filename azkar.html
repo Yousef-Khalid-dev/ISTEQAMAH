@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تطبيق استقامة - منصة الأذكار</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap");
+
+      :root {
+        --primary-green: #6baa5e;
+        --dark-green: #4a7c3f;
+        --soft-bg: #f4f7f4;
+        --white: #ffffff;
+        --text-main: #333;
+        --pattern-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l5 15 15 5-15 5-5 15-5-15-15-5 15-5z' fill='%236baa5e' fill-opacity='0.03'/%3E%3C/svg%3E");
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Tajawal", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #f4f7f4 0%,
+          #e8f3e6 50%,
+          #f4f7f4 100%
+        );
+        background-image: var(--pattern-url);
+        background-attachment: fixed;
+        min-height: 100vh;
+        color: var(--text-main);
+      }
+
+      .main-header {
+        background: var(--white);
+        padding: 1rem 5%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 3px solid var(--primary-green);
+      }
+
+      .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo-area h1 {
+        font-size: 22px;
+        color: var(--primary-green);
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+        flex: 1;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      #back-btn {
+        background: var(--white);
+        border: 1px solid var(--primary-green);
+        color: var(--primary-green);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      #back-btn:hover {
+        background: var(--primary-green);
+        color: white;
+      }
+
+      .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .category-card {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s ease;
+        border: 1px solid #e0eadd;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .category-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-green);
+        box-shadow: 0 10px 20px rgba(107, 170, 94, 0.1);
+      }
+
+      .category-icon {
+        font-size: 40px;
+        color: var(--primary-green);
+        margin-bottom: 15px;
+      }
+
+      .category-card strong {
+        display: block;
+        font-size: 18px;
+        color: var(--dark-green);
+      }
+
+      .zekr-card {
+        background: var(--white);
+        margin-bottom: 20px;
+        padding: 25px;
+        border-radius: 15px;
+        border-right: 6px solid var(--primary-green);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        position: relative;
+        transition: 0.2s;
+        cursor: pointer;
+      }
+
+      .zekr-card:hover {
+        background-color: #f9fff8;
+      }
+
+      #header-title {
+        color: var(--dark-green);
+        font-size: 24px;
+      }
+
+      .zekr-content {
+        font-size: 20px;
+        line-height: 1.8;
+        margin-bottom: 20px;
+        color: #222;
+      }
+
+      .zekr-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+      }
+
+      .counter-badge {
+        background: var(--primary-green);
+        color: white;
+        padding: 5px 20px;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .zekr-desc {
+        font-size: 12px;
+        color: #888;
+        max-width: 70%;
+      }
+
+      .zekr-card.done {
+        opacity: 0.5;
+        border-right-color: #ccc;
+      }
+
+      /* ---------- أنيميشن بدون تأثير على التخطيط (لا قفزات) ---------- */
+      .reset-container {
+        margin-bottom: 30px;
+        min-height: 52px; /* ارتفاع ثابت تقريبي للزر + هامش */
+        visibility: visible;
+        opacity: 1;
+        transition:
+          visibility 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      .reset-container.hidden {
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      @keyframes gentleFadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .reset-container:not(.hidden) {
+        animation: gentleFadeIn 0.25s ease;
+      }
+
+      .btn-reset {
+        background: #f8d7da;
+        color: #721c24;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: bold;
+        transition: 0.2s;
+        text-align: center;
+      }
+
+      .btn-reset:hover {
+        background: #f1c0c3;
+      }
+
+      #overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        z-index: 2500;
+      }
+
+      #links-menu {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100%;
+        background: white;
+        z-index: 3000;
+        padding: 20px 15px;
+        transition: 0.3s ease;
+        box-shadow: 5px 0 20px rgba(0, 0, 0, 0.15);
+        border-radius: 0 28px 28px 0;
+      }
+
+      .link-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        text-decoration: none;
+        color: black;
+        transition: 0.2s;
+      }
+
+      .link-item:hover {
+        background: #f0f7ef;
+        padding-right: 18px;
+      }
+
+      .link-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2px solid var(--primary-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-green);
+        background: white;
+      }
+
+      .link-item.active {
+        background: #f0f7ef;
+        border-right: 4px solid var(--primary-green);
+        color: var(--primary-green);
+        font-weight: bold;
+      }
+
+      #menu-btn {
+        background: var(--white);
+        border: 1px solid var(--primary-green);
+        color: var(--primary-green);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      #menu-btn:hover {
+        background: var(--primary-green);
+        color: white;
+      }
+
+      /* هايلايت رابط الأذكار */
+      #links-menu a[href="azkar.html"] {
+        background: #f0f8f0;
+        border-right: 4px solid var(--primary-green);
+        color: var(--primary-green);
+        font-weight: bold;
+      }
+
+      #links-menu a[href="azkar.html"] .link-circle {
+        background: var(--primary-green);
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .categories-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      a,
+      button,
+      [role="button"],
+      .clickable {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      /* حاوية الأذكار تتجدد بدون تأثير على الزر */
+      #zekr-list {
+        transition: all 0.1s;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="overlay" onclick="closeAll()"></div>
+
+    <div id="links-menu">
+      <a href="index.html" class="link-item">
+        <div class="link-circle"><i class="fa-solid fa-house"></i></div>
+        الرئيسية
+      </a>
+      <a href="azkar.html" class="link-item">
+        <div class="link-circle"><i class="fa-solid fa-hands-praying"></i></div>
+        الأذكار
+      </a>
+      <a href="quran.html" class="link-item">
+        <div class="link-circle"><i class="fa-solid fa-book"></i></div>
+        القرآن
+      </a>
+      <a href="prayertime.html" class="link-item">
+        <div class="link-circle"><i class="fa-solid fa-mosque"></i></div>
+        أوقات الصلاة
+      </a>
+      <a href="hadith.html" class="link-item">
+        <div class="link-circle"><i class="fa-solid fa-book-open"></i></div>
+        الأحاديث
+      </a>
+      <a href="qipla-direction.html" class="link-item">
+        <div class="link-circle">
+          <i class="fa-solid fa-location-arrow"></i>
+        </div>
+        إتجاه القبلة
+      </a>
+      <a href="about.html" class="link-item">
+        <div class="link-circle"><i class="fa-solid fa-circle-info"></i></div>
+        حول التطبيق
+      </a>
+    </div>
+
+    <header class="main-header">
+      <div class="logo-area">
+        <i
+          class="fa-solid fa-mosque"
+          style="color: var(--primary-green); font-size: 24px"
+        ></i>
+        <h1>تطبيق استقامة</h1>
+      </div>
+      <nav>
+        <i
+          class="fa-solid fa-bars"
+          onclick="toggleLinks()"
+          style="font-size: 20px; cursor: pointer"
+        ></i>
+      </nav>
+    </header>
+
+    <div class="container">
+      <div class="section-title">
+        <button id="menu-btn" onclick="toggleLinks()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <button id="back-btn" onclick="loadCategories()">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <h2 id="header-title">قسم الأذكار</h2>
+      </div>
+      <div id="main-content">
+        <!-- حاوية ثابتة: زر إعادة الضبط موجود دائماً ولكن مخفي -->
+        <div id="reset-section" class="reset-container hidden">
+          <button class="btn-reset" onclick="resetCurrentProgress()">
+            إعادة ضبط العدادات
+          </button>
+        </div>
+        <div id="zekr-list"></div>
+      </div>
+    </div>
+
+    <script>
+      // ------------------- إعدادات التخزين -------------------
+      const STORAGE_KEY = "azkar_progress_web";
+
+      function clearAllProgressOnExit() {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+      window.addEventListener("beforeunload", clearAllProgressOnExit);
+      clearAllProgressOnExit();
+      let progress = {};
+
+      function saveProgress() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      }
+
+      let currentCategoryId = null;
+      let currentCategoryKey = null;
+      let currentAzkarArray = [];
+      let currentOriginalCounts = [];
+
+      // عناصر ثابتة
+      const resetSection = document.getElementById("reset-section");
+      const zekrListDiv = document.getElementById("zekr-list");
+
+      function hasAnyProgress(catKey, originalCounts) {
+        if (!progress[catKey]) return false;
+        const curr = progress[catKey];
+        if (curr.length !== originalCounts.length) return false;
+        for (let i = 0; i < curr.length; i++) {
+          if (curr[i] < originalCounts[i]) return true;
+        }
+        return false;
+      }
+
+      // إظهار/إخفاء زر إعادة الضبط مع أنيميشن سلس (بدون قفز)
+      function updateResetButtonVisibility() {
+        if (!currentCategoryId || !currentOriginalCounts.length) {
+          resetSection.classList.add("hidden");
+          return;
+        }
+        const hasProgress = hasAnyProgress(
+          currentCategoryKey,
+          currentOriginalCounts,
+        );
+        if (hasProgress) {
+          resetSection.classList.remove("hidden");
+        } else {
+          resetSection.classList.add("hidden");
+        }
+      }
+
+      window.resetCurrentProgress = function () {
+        if (!currentCategoryId || !currentCategoryKey) return;
+        if (
+          !confirm("⚠️ هل أنت متأكد من إعادة ضبط جميع العدادات في هذا القسم؟")
+        )
+          return;
+        delete progress[currentCategoryKey];
+        saveProgress();
+        // إعادة تحميل الأذكار نفسها
+        renderZekrList();
+        updateResetButtonVisibility();
+      };
+
+      // تحديث عرض قائمة الأذكار فقط (دون المساس بـ reset-section)
+      function renderZekrList() {
+        if (!currentAzkarArray.length) {
+          zekrListDiv.innerHTML = "<p>⚠️ لا توجد أذكار في هذا القسم بعد.</p>";
+          return;
+        }
+        let html = "";
+        for (let i = 0; i < currentAzkarArray.length; i++) {
+          const zekr = currentAzkarArray[i];
+          const currentCount =
+            progress[currentCategoryKey]?.[i] ?? currentOriginalCounts[i];
+          const doneClass = currentCount === 0 ? "done" : "";
+          html += `
+            <div class="zekr-card ${doneClass}" data-zekr-index="${i}" onclick="updateCountByIndex(${i})">
+              <div class="zekr-content">${zekr.content}</div>
+              <div class="zekr-footer">
+                <div class="counter-badge" id="count-${i}">
+                  التكرار: ${currentCount}
+                </div>
+                <div class="zekr-desc">${zekr.description || ""}</div>
+              </div>
+            </div>
+          `;
+        }
+        zekrListDiv.innerHTML = html;
+      }
+
+      // تحميل الأذكار وتحديث القائمة
+      async function loadAzkar(id, name) {
+        headerTitle.innerText = name;
+        backBtn.style.display = "flex";
+        menuBtn.style.display = "none";
+        zekrListDiv.innerHTML =
+          "<p style='text-align:center'>جاري التحميل...</p>";
+        resetSection.classList.add("hidden"); // نخفيه مؤقتاً
+
+        currentCategoryId = id;
+        currentCategoryKey = id.replace(/\s+/g, "_");
+
+        try {
+          const res = await fetch("./azkar.json");
+          const data = await res.json();
+          const azkar = data[id] || [];
+          if (!azkar.length) {
+            zekrListDiv.innerHTML = "<p>⚠️ لا توجد أذكار في هذا القسم بعد.</p>";
+            currentAzkarArray = [];
+            currentOriginalCounts = [];
+            updateResetButtonVisibility();
+            return;
+          }
+
+          currentAzkarArray = azkar;
+          currentOriginalCounts = azkar.map((z) =>
+            z.count && typeof z.count === "number" ? z.count : 1,
+          );
+
+          if (!progress[currentCategoryKey]) {
+            progress[currentCategoryKey] = [...currentOriginalCounts];
+            saveProgress();
+          }
+
+          renderZekrList();
+          updateResetButtonVisibility(); // يظهر إذا كان هناك تقدم
+        } catch (err) {
+          console.error(err);
+          zekrListDiv.innerHTML =
+            "<p>❌ خطأ في تحميل ملف الأذكار (azkar.json). تأكد من وجود الملف.</p>";
+        }
+      }
+
+      // تحديث عداد ذكر معين (دون إعادة بناء القائمة كاملة)
+      window.updateCountByIndex = function (index) {
+        if (!currentCategoryKey || !currentAzkarArray.length) return;
+        const counts = progress[currentCategoryKey];
+        if (!counts || counts[index] <= 0) return;
+
+        counts[index]--;
+        saveProgress();
+
+        // تحديث العداد في الواجهة مباشرة
+        const counterSpan = document.getElementById(`count-${index}`);
+        if (counterSpan) counterSpan.innerText = `التكرار: ${counts[index]}`;
+
+        // تحديث كلاس done
+        const card = document.querySelector(
+          `.zekr-card[data-zekr-index="${index}"]`,
+        );
+        if (card && counts[index] === 0) {
+          card.classList.add("done");
+        }
+
+        updateResetButtonVisibility(); // إظهار أو إخفاء الزر حسب التقدم
+      };
+
+      // العودة للتصنيفات
+      function loadCategories() {
+        headerTitle.innerText = "قسم الأذكار";
+        backBtn.style.display = "none";
+        menuBtn.style.display = "flex";
+        closeAll();
+
+        currentCategoryId = null;
+        currentCategoryKey = null;
+        currentAzkarArray = [];
+        currentOriginalCounts = [];
+
+        resetSection.classList.add("hidden");
+
+        const categories = [
+          { id: "اذكار الصباح", name: "أذكار الصباح", icon: "fa-sun" },
+          { id: "اذكار المساء", name: "أذكار المساء", icon: "fa-moon" },
+          { id: "أذكار الاستيقاظ", name: "أذكار الاستيقاظ", icon: "fa-bell" },
+          { id: "أذكار النوم", name: "أذكار النوم", icon: "fa-bed" },
+          { id: "تسابيح", name: "تسابيح", icon: "fa-hands-praying" },
+        ];
+
+        let html = `<div class="categories-grid">`;
+        categories.forEach((cat) => {
+          html += `
+            <div class="category-card" onclick="loadAzkar('${cat.id}', '${cat.name}')">
+              <div class="category-icon"><i class="fa-solid ${cat.icon}"></i></div>
+              <strong>${cat.name}</strong>
+            </div>
+          `;
+        });
+        html += `</div>`;
+        zekrListDiv.innerHTML = html;
+      }
+
+      // القائمة الجانبية
+      function toggleLinks() {
+        const menu = document.getElementById("links-menu");
+        const overlayDiv = document.getElementById("overlay");
+        menu.style.left = "0";
+        overlayDiv.style.display = "block";
+      }
+
+      function closeAll() {
+        const menu = document.getElementById("links-menu");
+        const overlayDiv = document.getElementById("overlay");
+        menu.style.left = "-100%";
+        overlayDiv.style.display = "none";
+      }
+
+      const headerTitle = document.getElementById("header-title");
+      const backBtn = document.getElementById("back-btn");
+      const menuBtn = document.getElementById("menu-btn");
+
+      window.closeAll = closeAll;
+      window.toggleLinks = toggleLinks;
+      window.loadCategories = loadCategories;
+      window.loadAzkar = loadAzkar;
+      window.updateCountByIndex = updateCountByIndex;
+
+      loadCategories();
+      window.addEventListener("pagehide", clearAllProgressOnExit);
+    </script>
+  </body>
+</html>
